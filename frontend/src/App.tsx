@@ -4,6 +4,7 @@ import { usePVGIS } from './hooks/usePVGIS';
 import { getDefaultAppliances } from './data/appliances';
 import { calculateConsumptionProfile } from './lib/consumption';
 import { calculateRecommendation, estimateSpecificYield, buildPanelConfig, DEFAULT_PRICING } from './lib/recommendation';
+import { generateReport } from './lib/report';
 import LocationPicker from './components/Map/LocationPicker';
 import ConsumptionEstimator from './components/Consumption/ConsumptionEstimator';
 import PanelControls from './components/Controls/PanelControls';
@@ -53,8 +54,19 @@ export default function App() {
   const [hour, setHour] = useState(12);
   const [dayOfYear, setDayOfYear] = useState(172);
   const [pricing, setPricing] = useState<ElectricityPricing>(DEFAULT_PRICING);
+  const [manualKwh, setManualKwh] = useState<number | null>(null);
+  const [useManualInput, setUseManualInput] = useState(false);
 
-  const consumption = useMemo(() => calculateConsumptionProfile(appliances), [appliances]);
+  const consumption = useMemo(() => {
+    if (useManualInput && manualKwh !== null && manualKwh > 0) {
+      // Distribute manual input evenly across months (slight seasonal variation)
+      const monthlyWeights = [1.1, 1.05, 1.0, 0.9, 0.85, 0.8, 0.8, 0.85, 0.9, 1.0, 1.05, 1.1];
+      const weightSum = monthlyWeights.reduce((a, b) => a + b, 0);
+      const monthlyKwh = monthlyWeights.map((w) => (manualKwh * w) / weightSum);
+      return { appliances, annualKwh: manualKwh, monthlyKwh };
+    }
+    return calculateConsumptionProfile(appliances);
+  }, [appliances, useManualInput, manualKwh]);
 
   const specificYield = useMemo(() => {
     if (result) return result.specificYield;
@@ -174,15 +186,67 @@ export default function App() {
 
             {step === 'consumption' && (
               <div className="flex flex-col h-full">
-                <div className="mb-4">
+                <div className="mb-3">
                   <h2 className="text-lg font-medium text-neutral-200 mb-1">Your energy usage</h2>
                   <p className="text-xs text-neutral-500">
-                    Select the appliances in your home. We'll calculate how much solar you need.
+                    Select your appliances, or enter your annual consumption directly from your electricity bill.
                   </p>
                 </div>
-                <div className="flex-1 min-h-0">
-                  <ConsumptionEstimator appliances={appliances} onChange={setAppliances} />
+
+                {/* Toggle: appliances vs manual */}
+                <div className="flex gap-1 mb-4 p-0.5 bg-neutral-800 rounded-md">
+                  <button
+                    onClick={() => setUseManualInput(false)}
+                    className={`flex-1 py-1.5 text-xs rounded transition-colors ${
+                      !useManualInput ? 'bg-neutral-700 text-neutral-100 font-medium' : 'text-neutral-400'
+                    }`}
+                  >
+                    Select Appliances
+                  </button>
+                  <button
+                    onClick={() => setUseManualInput(true)}
+                    className={`flex-1 py-1.5 text-xs rounded transition-colors ${
+                      useManualInput ? 'bg-neutral-700 text-neutral-100 font-medium' : 'text-neutral-400'
+                    }`}
+                  >
+                    Enter kWh Manually
+                  </button>
                 </div>
+
+                {useManualInput ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs text-neutral-500 block mb-1">Annual consumption (kWh)</label>
+                      <input
+                        type="number"
+                        min="500"
+                        max="100000"
+                        step="100"
+                        value={manualKwh ?? ''}
+                        onChange={(e) => setManualKwh(e.target.value ? parseInt(e.target.value) : null)}
+                        placeholder="e.g. 4500"
+                        className="w-full px-3 py-2.5 text-sm bg-neutral-800 border border-neutral-700 rounded text-neutral-200 focus:border-amber-500 focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <p className="text-xs text-neutral-500 leading-relaxed">
+                      You can find this on your electricity bill or provider's app.
+                      Average EU household: 3,500 - 5,000 kWh/year.
+                    </p>
+                    {manualKwh && manualKwh > 0 && (
+                      <div className="text-sm text-neutral-300 bg-neutral-800/50 rounded p-3 border border-neutral-700/50">
+                        <span className="font-mono text-lg text-neutral-100">{manualKwh.toLocaleString()}</span>
+                        <span className="text-neutral-400 ml-1.5">kWh/year</span>
+                        <span className="text-neutral-500 text-xs ml-3">
+                          (~{Math.round(manualKwh / 12)} kWh/month)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex-1 min-h-0">
+                    <ConsumptionEstimator appliances={appliances} onChange={setAppliances} />
+                  </div>
+                )}
               </div>
             )}
 
@@ -267,6 +331,14 @@ export default function App() {
                 className="px-5 py-2 text-sm font-medium rounded border border-amber-600 text-amber-400 hover:bg-amber-600/10 transition-colors"
               >
                 Adjust System
+              </button>
+            )}
+            {step === 'results' && result && (
+              <button
+                onClick={() => generateReport({ location, panel, consumption, recommendation, simulation: result })}
+                className="px-5 py-2 text-sm font-medium rounded bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors"
+              >
+                Export PDF
               </button>
             )}
           </div>
