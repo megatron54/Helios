@@ -3,6 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,14 +31,15 @@ jobs:
           cd engine/wasm/build
           emcmake cmake ..
           cmake --build .
+          # Copy to a flat directory for artifact upload
+          mkdir -p /tmp/wasm-out
+          cp helios.js helios.wasm /tmp/wasm-out/
 
       - name: Upload WASM artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wasm-build
-          path: |
-            engine/wasm/build/helios.js
-            engine/wasm/build/helios.wasm
+          path: /tmp/wasm-out/
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -62,9 +64,22 @@ jobs:
           name: wasm-build
           path: frontend/public/
 
+      - name: Verify WASM files
+        run: |
+          echo "Contents of frontend/public/:"
+          ls -la frontend/public/
+          test -f frontend/public/helios.js || (echo "ERROR: helios.js not found" && exit 1)
+          test -f frontend/public/helios.wasm || (echo "ERROR: helios.wasm not found" && exit 1)
+
       - name: Build frontend
         working-directory: frontend
         run: npm run build
+
+      - name: Verify dist output
+        run: |
+          echo "Contents of frontend/dist/:"
+          ls -la frontend/dist/
+          ls -la frontend/dist/assets/ | head -10
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
