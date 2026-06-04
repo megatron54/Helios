@@ -8,6 +8,7 @@ import type {
   FullRecommendation,
   ElectricityPricing,
   DispatchSummary,
+  GridMode,
 } from '../types';
 import { DEFAULT_BATTERY, defaultInverter } from './defaults';
 import { runEnergyDispatch, monthlyToHourlyLoad } from './energy-dispatch';
@@ -33,6 +34,10 @@ export function optimizeSystem(input: OptimizerInput): FullRecommendation {
 
   // Step 1: Size PV array
   const panelCount = sizePvArray(consumption.annualKwh, specificYield, panelWp, maxPanels, priority);
+  if (panelCount === 0) {
+    // Edge case: no panels fit on roof — return minimal result
+    return emptyRecommendation(gridMode);
+  }
   const systemKwp = (panelCount * panelWp) / 1000;
 
   // (final PV scaling done after budget constraint below)
@@ -137,6 +142,9 @@ function sizePvArray(
   annualKwh: number, specificYield: number, panelWp: number,
   maxPanels: number, priority: string,
 ): number {
+  if (maxPanels <= 0) return 0;
+  if (specificYield <= 0 || panelWp <= 0 || annualKwh <= 0) return 1;
+
   // Target coverage based on priority
   const targetCoverage = priority === 'independence' ? 1.1 : priority === 'cost' ? 0.75 : 0.9;
   const requiredKwp = (annualKwh * targetCoverage) / specificYield;
@@ -284,5 +292,38 @@ function calculateFinancials(
     annualMaintenance,
     lcoe,
     npv25: npv,
+  };
+}
+
+function emptyRecommendation(gridMode: GridMode): FullRecommendation {
+  return {
+    panelsNeeded: 0,
+    systemSizeKwp: 0,
+    annualProductionKwh: 0,
+    selfConsumptionRatio: 0,
+    coverageRatio: 0,
+    estimatedCostEur: 0,
+    paybackYears: 99,
+    co2SavedKgYear: 0,
+    annualSavingsEur: 0,
+    system: {
+      panels: { tilt: 0, azimuth: 180, ratedPower: 0, efficiency: 0, area: 0, tempCoeff: 0, noct: 45, quantity: 0 },
+      inverter: null as unknown as InverterConfig,
+      battery: null,
+      generator: null,
+      gridMode,
+    },
+    dispatch: {
+      totalProduction: 0, totalConsumption: 0, selfConsumed: 0,
+      batteryThroughput: 0, gridImported: 0, gridExported: 0,
+      generatorProduced: 0, generatorRuntimeHours: 0, generatorFuelLiters: 0,
+      unmetLoadTotal: 0, selfSufficiencyRatio: 0, selfConsumptionRatio: 0,
+      batteryCycles: 0, peakUnmetKw: 0,
+    },
+    batteryLifetime: null,
+    annualFuelCostEur: 0,
+    annualMaintenanceCostEur: 0,
+    lcoeEurPerKwh: 0,
+    twentyFiveYearNpv: 0,
   };
 }

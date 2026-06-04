@@ -185,10 +185,10 @@ export function runEnergyDispatch(input: DispatchInput): DispatchOutput {
     generatorFuelLiters: genFuel,
     unmetLoadTotal: unmetTotal,
     selfSufficiencyRatio: totalCons > 0
-      ? (selfConsumed + battDischarged) / totalCons
+      ? Math.min(1, (selfConsumed + battDischarged + genProduced) / totalCons)
       : 0,
     selfConsumptionRatio: totalProd > 0
-      ? (selfConsumed + battCharged) / totalProd
+      ? Math.min(1, (selfConsumed + battCharged) / totalProd)
       : 0,
     batteryCycles,
     peakUnmetKw: peakUnmet,
@@ -203,6 +203,8 @@ export function runEnergyDispatch(input: DispatchInput): DispatchOutput {
  */
 export function monthlyToHourlyLoad(monthlyKwh: number[]): number[] {
   const hourly: number[] = new Array(8760).fill(0);
+  if (!monthlyKwh || monthlyKwh.length < 12) return hourly;
+
   // Daily load shape (fraction of daily total per hour)
   // Peaks at 8-9am and 6-9pm, low at night
   const pattern = [
