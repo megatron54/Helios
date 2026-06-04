@@ -1,9 +1,10 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import type { PanelConfig, Location } from '../../types';
 import Roof from './Roof';
 import PanelArray from './PanelArray';
 import Sun from './Sun';
+import Environment from './Environment';
 
 interface SolarSceneProps {
   panel: PanelConfig;
@@ -16,38 +17,23 @@ export default function SolarScene({ panel, location, hour, dayOfYear }: SolarSc
   return (
     <Canvas
       shadows
-      camera={{ position: [10, 7, 10], fov: 45 }}
+      camera={{ position: [12, 8, 12], fov: 42, near: 0.1, far: 1000 }}
       className="w-full h-full"
-      gl={{ antialias: true, toneMapping: 3 }}
+      gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.8 }}
     >
-      <color attach="background" args={['#0d0d0d']} />
-      <fog attach="fog" args={['#0d0d0d', 20, 50]} />
-      <ambientLight intensity={0.08} />
-
+      <Environment location={location} hour={hour} dayOfYear={dayOfYear} />
       <Sun location={location} hour={hour} dayOfYear={dayOfYear} />
-
-      <Grid
-        position={[0, -0.01, 0]}
-        args={[40, 40]}
-        cellSize={1}
-        cellColor="#1a1a1a"
-        sectionSize={5}
-        sectionColor="#262626"
-        fadeDistance={25}
-        fadeStrength={1}
-        infiniteGrid
-      />
 
       <Roof />
       <PanelArray panel={panel} />
 
       <OrbitControls
         enableDamping
-        dampingFactor={0.05}
-        minDistance={4}
-        maxDistance={25}
-        maxPolarAngle={Math.PI / 2.05}
-        target={[0, 2, 0]}
+        dampingFactor={0.06}
+        minDistance={5}
+        maxDistance={40}
+        maxPolarAngle={Math.PI / 2.02}
+        target={[0, 2.5, 0]}
       />
     </Canvas>
   );

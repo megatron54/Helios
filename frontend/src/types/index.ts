@@ -85,3 +85,42 @@ export interface TMYData {
   dhi: Float64Array;
   temperature: Float64Array;
 }
+
+// Consumption estimator types
+
+export interface Appliance {
+  id: string;
+  name: string;
+  category: ApplianceCategory;
+  powerW: number;         // typical power draw in watts
+  hoursPerDay: number;    // average hours of use per day
+  daysPerYear: number;    // days active per year (seasonality)
+  enabled: boolean;
+  quantity: number;
+}
+
+export type ApplianceCategory = 'essential' | 'comfort' | 'mobility' | 'heating' | 'other';
+
+export interface ConsumptionProfile {
+  appliances: Appliance[];
+  annualKwh: number;
+  monthlyKwh: number[];   // 12 values
+}
+
+export interface SystemRecommendation {
+  panelsNeeded: number;
+  systemSizeKwp: number;
+  annualProductionKwh: number;
+  selfConsumptionRatio: number;
+  coverageRatio: number;
+  estimatedCostEur: number;
+  paybackYears: number;
+  co2SavedKgYear: number;
+  annualSavingsEur: number;
+}
+
+export interface ElectricityPricing {
+  pricePerKwh: number;    // EUR/kWh
+  feedInTariff: number;   // EUR/kWh for surplus sold
+  annualIncrease: number; // expected annual price increase %
+}
