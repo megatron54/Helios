@@ -11,9 +11,8 @@ interface SidebarProps {
   onTmyLoaded: (tmy: TMYData | null) => void;
   tmy: TMYData | null;
   result: SimulationResult | null;
-  onSimulate: (r: SimulationResult | null) => void;
+  onSimulate: () => void;
   simulating: boolean;
-  onSimulatingChange: (s: boolean) => void;
 }
 
 export default function Sidebar({
@@ -24,11 +23,9 @@ export default function Sidebar({
   onTmyLoaded,
   tmy,
   result,
-  onSimulate: _onSimulate,
+  onSimulate,
   simulating,
-  onSimulatingChange,
 }: SidebarProps) {
-  void _onSimulate;
   return (
     <aside className="w-80 border-r border-neutral-800 flex flex-col overflow-y-auto shrink-0">
       <section className="p-4 border-b border-neutral-800">
@@ -48,12 +45,7 @@ export default function Sidebar({
       <section className="p-4 border-b border-neutral-800">
         <button
           disabled={!tmy || simulating}
-          onClick={() => {
-            if (!tmy) return;
-            onSimulatingChange(true);
-            // Simulation will be triggered by integration layer
-            onSimulatingChange(false);
-          }}
+          onClick={onSimulate}
           className="w-full py-2 px-4 text-sm font-medium rounded bg-amber-600 hover:bg-amber-500 disabled:bg-neutral-700 disabled:text-neutral-500 transition-colors"
         >
           {simulating ? 'Simulating...' : tmy ? 'Run Simulation' : 'Select location first'}

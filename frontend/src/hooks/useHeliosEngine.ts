@@ -1,50 +1,80 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { HeliosModule } from '../types';
 
-declare function createHeliosModule(): Promise<HeliosModule>;
-
 let modulePromise: Promise<HeliosModule> | null = null;
+let cachedModule: HeliosModule | null = null;
 
-function getModule(): Promise<HeliosModule> {
-  if (!modulePromise) {
-    modulePromise = createHeliosModule();
-  }
+function loadModule(): Promise<HeliosModule> {
+  if (cachedModule) return Promise.resolve(cachedModule);
+  if (modulePromise) return modulePromise;
+
+  modulePromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = import.meta.env.BASE_URL + 'helios.js';
+    script.onload = () => {
+      const factory = (window as unknown as Record<string, unknown>)['createHeliosModule'] as
+        (opts?: Record<string, unknown>) => Promise<HeliosModule>;
+
+      if (!factory) {
+        reject(new Error('createHeliosModule not found'));
+        return;
+      }
+
+      factory({
+        locateFile: (path: string) => import.meta.env.BASE_URL + path,
+      })
+        .then((mod) => {
+          cachedModule = mod;
+          resolve(mod);
+        })
+        .catch(reject);
+    };
+    script.onerror = () => reject(new Error('Failed to load helios.js'));
+    document.head.appendChild(script);
+  });
+
   return modulePromise;
 }
 
 export function useHeliosEngine() {
-  const [engine, setEngine] = useState<HeliosModule | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [engine, setEngine] = useState<HeliosModule | null>(cachedModule);
+  const [loading, setLoading] = useState(!cachedModule);
   const [error, setError] = useState<string | null>(null);
+  const mounted = useRef(true);
 
   useEffect(() => {
-    let cancelled = false;
+    mounted.current = true;
+    if (cachedModule) {
+      setEngine(cachedModule);
+      setLoading(false);
+      return;
+    }
 
-    getModule()
+    loadModule()
       .then((mod) => {
-        if (!cancelled) {
+        if (mounted.current) {
           setEngine(mod);
           setLoading(false);
         }
       })
       .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || 'Failed to load simulation engine');
+        if (mounted.current) {
+          setError(err.message || 'Failed to load engine');
           setLoading(false);
         }
       });
 
-    return () => { cancelled = true; };
+    return () => { mounted.current = false; };
   }, []);
 
   const reset = useCallback(() => {
     modulePromise = null;
+    cachedModule = null;
     setLoading(true);
     setError(null);
-    getModule()
-      .then(setEngine)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    loadModule()
+      .then((mod) => { setEngine(mod); setLoading(false); })
+      .catch((err) => { setError(err.message); setLoading(false); });
   }, []);
 
   return { engine, loading, error, reset };
