@@ -328,7 +328,7 @@ export default function App() {
               </button>
             )}
             {step === 'results' && result && (
-              <button onClick={() => generateReport({ location, panel, consumption, recommendation, simulation: result })} className="px-3.5 py-1.5 text-[12px] text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors">
+              <button onClick={() => generateReport({ location, panel, consumption, recommendation, simulation: result, fullRec })} className="px-3.5 py-1.5 text-[12px] text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors">
                 Export PDF
               </button>
             )}
