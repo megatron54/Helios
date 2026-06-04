@@ -20,28 +20,28 @@ function ApplianceRow({
   const annual = applianceAnnualKwh(appliance);
 
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded text-sm transition-colors ${
-      appliance.enabled ? 'bg-neutral-800/60' : 'opacity-50'
+    <div className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[13px] transition-all ${
+      appliance.enabled ? 'bg-white/[0.04]' : 'opacity-40'
     }`}>
       <input
         type="checkbox"
         checked={appliance.enabled}
         onChange={onToggle}
-        className="accent-amber-500 w-3.5 h-3.5 shrink-0"
+        className="accent-amber-500 w-3.5 h-3.5 shrink-0 rounded"
       />
-      <span className="flex-1 text-neutral-200 truncate">{appliance.name}</span>
+      <span className="flex-1 text-white/70 truncate">{appliance.name}</span>
       {appliance.enabled && (
         <>
           <select
             value={appliance.quantity}
             onChange={(e) => onQuantityChange(Number(e.target.value))}
-            className="w-12 text-xs bg-neutral-700 border border-neutral-600 rounded px-1 py-0.5 text-neutral-200"
+            className="w-12 text-[11px] bg-white/[0.06] border border-white/[0.08] rounded-md px-1 py-0.5 text-white/60 focus:outline-none"
           >
             {[1, 2, 3, 4, 5].map((n) => (
               <option key={n} value={n}>{n}x</option>
             ))}
           </select>
-          <span className="text-xs text-neutral-400 font-mono w-16 text-right">
+          <span className="text-[11px] text-white/25 font-mono w-14 text-right">
             {annual >= 1000 ? `${(annual / 1000).toFixed(1)}M` : `${annual.toFixed(0)}`}
           </span>
         </>
@@ -65,13 +65,13 @@ function CategorySection({
   const categoryTotal = categoryAppliances.reduce((sum, a) => sum + applianceAnnualKwh(a), 0);
 
   return (
-    <div className="mb-3">
-      <div className="flex items-center justify-between mb-1.5">
-        <h4 className="text-xs font-medium text-neutral-400 uppercase tracking-wide">
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-1.5 px-1">
+        <h4 className="text-[10px] font-medium text-white/25 uppercase tracking-wider">
           {getCategoryLabel(category)}
         </h4>
-        <span className="text-xs text-neutral-500 font-mono">
-          {categoryTotal.toFixed(0)} kWh/yr
+        <span className="text-[10px] text-white/20 font-mono">
+          {categoryTotal.toFixed(0)} kWh
         </span>
       </div>
       <div className="space-y-0.5">
@@ -104,25 +104,25 @@ export default function ConsumptionEstimator({ appliances, onChange }: Consumpti
 
   return (
     <div className="flex flex-col h-full">
-      {/* Summary header */}
-      <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-neutral-800">
+      {/* Summary */}
+      <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-white/[0.06]">
         <div>
-          <span className="text-2xl font-semibold text-neutral-100 font-mono">
+          <span className="text-2xl font-semibold text-white font-mono tracking-tight">
             {totalAnnual >= 10000 
               ? `${(totalAnnual / 1000).toFixed(1)}` 
               : totalAnnual.toFixed(0)
             }
           </span>
-          <span className="text-sm text-neutral-400 ml-1.5">
+          <span className="text-[13px] text-white/30 ml-1.5">
             {totalAnnual >= 10000 ? 'MWh/year' : 'kWh/year'}
           </span>
         </div>
-        <span className="text-xs text-neutral-500">
-          ~{(totalAnnual / 12).toFixed(0)} kWh/month
+        <span className="text-[11px] text-white/20 font-mono">
+          ~{(totalAnnual / 12).toFixed(0)} kWh/mo
         </span>
       </div>
 
-      {/* Appliance list by category */}
+      {/* Appliance list */}
       <div className="flex-1 overflow-y-auto pr-1 -mr-1">
         {getCategoryOrder().map((cat) => (
           <CategorySection

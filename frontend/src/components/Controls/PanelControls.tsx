@@ -34,10 +34,10 @@ function Slider({
   tooltip?: string;
 }) {
   return (
-    <div className="mb-2.5">
-      <label className="flex items-center justify-between text-xs text-neutral-400 mb-0.5" title={tooltip}>
+    <div className="mb-3">
+      <label className="flex items-center justify-between text-[11px] text-white/35 mb-1" title={tooltip}>
         <span>{label}</span>
-        <span className="text-neutral-300 font-mono text-xs">{value}{unit}</span>
+        <span className="text-white/60 font-mono text-[12px]">{value}{unit}</span>
       </label>
       <input
         type="range"
@@ -67,11 +67,11 @@ export default function PanelControls({ panel, onChange, maxPanels }: PanelContr
   return (
     <div>
       {/* Preset selector */}
-      <div className="mb-3">
-        <label className="text-xs text-neutral-500 block mb-1">Module</label>
+      <div className="mb-4">
+        <label className="text-[11px] text-white/30 block mb-1.5">Module</label>
         <select
           onChange={(e) => applyPreset(e.target.value)}
-          className="w-full px-2 py-1.5 text-sm bg-neutral-800 border border-neutral-700 rounded text-neutral-200 focus:border-amber-500 focus:outline-none"
+          className="w-full px-3 py-2 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white/80 focus:border-amber-500/40 focus:outline-none appearance-none cursor-pointer"
         >
           {Object.keys(PANEL_PRESETS).map((name) => (
             <option key={name} value={name}>{name}</option>
@@ -82,39 +82,39 @@ export default function PanelControls({ panel, onChange, maxPanels }: PanelContr
       <Slider
         label="Tilt"
         value={panel.tilt}
-        min={0} max={90} step={1} unit="°"
+        min={0} max={90} step={1} unit="deg"
         onChange={(v) => update('tilt', v)}
         tooltip="Angle from horizontal. Optimal is roughly equal to latitude."
       />
       <Slider
         label="Azimuth"
         value={panel.azimuth}
-        min={0} max={359} step={1} unit="°"
+        min={0} max={359} step={1} unit="deg"
         onChange={(v) => update('azimuth', v)}
-        tooltip="0°=North, 90°=East, 180°=South, 270°=West"
+        tooltip="0=North, 90=East, 180=South, 270=West"
       />
       <Slider
         label="Panels"
-        value={panel.quantity}
+        value={Math.min(panel.quantity, maxPanels)}
         min={1} max={maxPanels} step={1} unit={` / ${maxPanels}`}
         onChange={(v) => update('quantity', v)}
-        tooltip={`Max ${maxPanels} panels fit on your roof`}
+        tooltip={`Max ${maxPanels} panels fit on your roof at this tilt`}
       />
 
       {/* Advanced toggle */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="text-xs text-neutral-500 hover:text-neutral-300 mt-2 mb-1 transition-colors"
+        className="text-[11px] text-white/25 hover:text-white/50 mt-2 mb-1 transition-colors"
       >
-        {showAdvanced ? '− Hide advanced' : '+ Show advanced'}
+        {showAdvanced ? 'Hide advanced parameters' : 'Show advanced parameters'}
       </button>
 
       {showAdvanced && (
-        <div className="mt-2 pt-2 border-t border-neutral-800">
+        <div className="mt-3 pt-3 border-t border-white/[0.06]">
           <Slider
             label="Power"
             value={panel.ratedPower}
-            min={200} max={700} step={10} unit="Wp"
+            min={200} max={700} step={10} unit=" Wp"
             onChange={(v) => update('ratedPower', v)}
             tooltip="Rated power at Standard Test Conditions"
           />
@@ -127,14 +127,14 @@ export default function PanelControls({ panel, onChange, maxPanels }: PanelContr
           <Slider
             label="Temp coeff"
             value={panel.tempCoeff}
-            min={-0.5} max={-0.2} step={0.01} unit="%/°C"
+            min={-0.5} max={-0.2} step={0.01} unit=" %/C"
             onChange={(v) => update('tempCoeff', v)}
             tooltip="Power temperature coefficient (Pmax)"
           />
           <Slider
             label="NOCT"
             value={panel.noct}
-            min={40} max={50} step={1} unit="°C"
+            min={40} max={50} step={1} unit=" C"
             onChange={(v) => update('noct', v)}
             tooltip="Nominal Operating Cell Temperature"
           />

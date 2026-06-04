@@ -8,11 +8,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Range inputs */
@@ -24,60 +24,91 @@ input[type="range"] {
   height: 20px;
 }
 input[type="range"]::-webkit-slider-track {
-  background: #252530;
+  background: rgba(255, 255, 255, 0.06);
   height: 3px;
   border-radius: 2px;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #d97706;
-  margin-top: -4.5px;
-  box-shadow: 0 0 4px rgba(217, 119, 6, 0.4);
+  margin-top: -5.5px;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.25), 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 input[type="range"]::-moz-range-track {
-  background: #252530;
+  background: rgba(255, 255, 255, 0.06);
   height: 3px;
   border-radius: 2px;
 }
 input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #d97706;
   border: none;
-  box-shadow: 0 0 4px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Number input arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.4;
+  opacity: 0;
+}
+input[type="number"]:hover::-webkit-inner-spin-button,
+input[type="number"]:hover::-webkit-outer-spin-button {
+  opacity: 0.3;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(217, 119, 6, 0.3);
+  background: rgba(217, 119, 6, 0.25);
 }
 
 /* Focus ring */
 *:focus-visible {
-  outline: 1px solid rgba(217, 119, 6, 0.5);
+  outline: 1px solid rgba(217, 119, 6, 0.4);
   outline-offset: 1px;
 }
 
-/* Transitions on step content */
+/* Step transitions */
 aside > div > div {
-  animation: slideIn 0.12s ease-out;
+  animation: fadeSlide 0.18s ease-out;
 }
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-6px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Select styling */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px !important;
+}
+select option {
+  background: #18181b;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* No user-select on controls */
 button, label, nav, header {
   user-select: none;
+}
+
+/* Smooth canvas transitions */
+canvas {
+  transition: filter 0.3s;
 }
