@@ -19,7 +19,7 @@ export default function SolarScene({ panel, location, hour, dayOfYear }: SolarSc
       shadows
       camera={{ position: [12, 8, 12], fov: 42, near: 0.1, far: 1000 }}
       className="w-full h-full"
-      gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.8 }}
+      gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1.2 }}
     >
       <Environment location={location} hour={hour} dayOfYear={dayOfYear} />
       <Sun location={location} hour={hour} dayOfYear={dayOfYear} />

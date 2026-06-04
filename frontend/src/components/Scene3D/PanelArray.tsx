@@ -39,15 +39,16 @@ export default function PanelArray({ panel }: PanelArrayProps) {
           <mesh castShadow receiveShadow position={[0, 0.02, 0]}>
             <boxGeometry args={[layout.panelWidth, 0.02, layout.panelHeight]} />
             <meshStandardMaterial
-              color="#0f1b33"
-              metalness={0.7}
-              roughness={0.2}
+              color="#1a3355"
+              metalness={0.6}
+              roughness={0.15}
+              envMapIntensity={1.2}
             />
           </mesh>
           {/* Panel frame */}
           <mesh castShadow position={[0, 0, 0]}>
             <boxGeometry args={[layout.panelWidth + 0.03, 0.03, layout.panelHeight + 0.03]} />
-            <meshStandardMaterial color="#333333" metalness={0.4} roughness={0.6} />
+            <meshStandardMaterial color="#aaaaaa" metalness={0.6} roughness={0.4} />
           </mesh>
         </group>
       ))}

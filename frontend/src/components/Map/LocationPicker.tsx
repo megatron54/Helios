@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import type { Location, TMYData } from '../../types';
 import { usePVGIS } from '../../hooks/usePVGIS';
+import '../../lib/leaflet-fix';
 import 'leaflet/dist/leaflet.css';
 
 interface LocationPickerProps {
