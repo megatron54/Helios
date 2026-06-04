@@ -1,19 +1,24 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import type { SimulationResult } from '../../types';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
+import type { SimulationResult, ConsumptionProfile } from '../../types';
 
 interface MonthlyChartProps {
   result: SimulationResult;
+  consumption?: ConsumptionProfile;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export default function MonthlyChart({ result }: MonthlyChartProps) {
-  const data = MONTHS.map((name, i) => ({
-    name,
-    kwh: Math.round(result.getMonthly(i).energyKwh),
-  }));
-
-  const maxKwh = Math.max(...data.map((d) => d.kwh));
+export default function MonthlyChart({ result, consumption }: MonthlyChartProps) {
+  const data = MONTHS.map((name, i) => {
+    const entry: Record<string, string | number> = {
+      name,
+      production: Math.round(result.getMonthly(i).energyKwh),
+    };
+    if (consumption) {
+      entry.consumption = Math.round(consumption.monthlyKwh[i]);
+    }
+    return entry;
+  });
 
   return (
     <div className="h-full w-full">
@@ -35,20 +40,33 @@ export default function MonthlyChart({ result }: MonthlyChartProps) {
             contentStyle={{
               backgroundColor: '#171717',
               border: '1px solid #262626',
-              borderRadius: '4px',
+              borderRadius: '6px',
               fontSize: '12px',
             }}
             labelStyle={{ color: '#a3a3a3' }}
-            formatter={(value) => [`${value} kWh`, 'Production']}
           />
-          <Bar dataKey="kwh" radius={[2, 2, 0, 0]}>
-            {data.map((entry, i) => (
-              <Cell
-                key={i}
-                fill={entry.kwh === maxKwh ? '#d97706' : '#525252'}
-              />
-            ))}
-          </Bar>
+          {consumption && (
+            <Legend
+              wrapperStyle={{ fontSize: '11px', color: '#a3a3a3' }}
+              iconSize={8}
+            />
+          )}
+          <Bar
+            dataKey="production"
+            name="Production"
+            fill="#d97706"
+            radius={[2, 2, 0, 0]}
+          />
+          {consumption && (
+            <Bar
+              dataKey="consumption"
+              name="Consumption"
+              fill="#3b82f6"
+              radius={[2, 2, 0, 0]}
+              opacity={0.6}
+            />
+          )}
+          <ReferenceLine y={0} stroke="#262626" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -1,1 +1,89 @@
 @import "tailwindcss";
+
+/* Custom scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+/* Range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: #262626;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #d97706;
+  margin-top: -5px;
+  border: 2px solid #0a0a0a;
+}
+
+input[type="range"]::-moz-range-track {
+  background: #262626;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d97706;
+  border: 2px solid #0a0a0a;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Select styling */
+select {
+  cursor: pointer;
+}
+
+/* Leaflet dark theme override */
+.leaflet-container {
+  background: #171717 !important;
+}
+
+/* Prevent text selection on interactive elements */
+button, label, nav {
+  user-select: none;
+}
+
+/* Smooth transitions on step changes */
+aside > div {
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

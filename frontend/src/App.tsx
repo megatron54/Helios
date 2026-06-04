@@ -3,15 +3,16 @@ import { useHeliosEngine } from './hooks/useHeliosEngine';
 import { usePVGIS } from './hooks/usePVGIS';
 import { getDefaultAppliances } from './data/appliances';
 import { calculateConsumptionProfile } from './lib/consumption';
-import { calculateRecommendation, estimateSpecificYield, buildPanelConfig } from './lib/recommendation';
+import { calculateRecommendation, estimateSpecificYield, buildPanelConfig, DEFAULT_PRICING } from './lib/recommendation';
 import LocationPicker from './components/Map/LocationPicker';
 import ConsumptionEstimator from './components/Consumption/ConsumptionEstimator';
 import PanelControls from './components/Controls/PanelControls';
+import PricingInput from './components/Controls/PricingInput';
 import ResultsDashboard from './components/Results/ResultsDashboard';
 import MonthlyChart from './components/Charts/MonthlyChart';
 import SolarScene from './components/Scene3D/SolarScene';
 import TimeControls from './components/Controls/TimeControls';
-import type { Location, PanelConfig, SimulationResult, TMYData, Appliance } from './types';
+import type { Location, PanelConfig, SimulationResult, TMYData, Appliance, ElectricityPricing } from './types';
 
 type Step = 'location' | 'consumption' | 'system' | 'results';
 
@@ -51,6 +52,7 @@ export default function App() {
   const [simulating, setSimulating] = useState(false);
   const [hour, setHour] = useState(12);
   const [dayOfYear, setDayOfYear] = useState(172);
+  const [pricing, setPricing] = useState<ElectricityPricing>(DEFAULT_PRICING);
 
   const consumption = useMemo(() => calculateConsumptionProfile(appliances), [appliances]);
 
@@ -64,8 +66,9 @@ export default function App() {
       consumption,
       specificYield,
       panelWp: panel.ratedPower,
+      pricing,
     });
-  }, [consumption, specificYield, panel.ratedPower]);
+  }, [consumption, specificYield, panel.ratedPower, pricing]);
 
   const handleLocationConfirm = async () => {
     const data = await fetchTMY(location);
@@ -213,6 +216,9 @@ export default function App() {
                   consumption={consumption}
                   simulation={result}
                 />
+                <div className="pt-2 border-t border-neutral-800">
+                  <PricingInput pricing={pricing} onChange={setPricing} />
+                </div>
               </div>
             )}
           </div>
@@ -293,7 +299,7 @@ export default function App() {
             />
             {result ? (
               <div className="flex-1 h-40">
-                <MonthlyChart result={result} />
+                <MonthlyChart result={result} consumption={consumption} />
               </div>
             ) : (
               <div className="flex-1 flex items-center justify-center text-xs text-neutral-600">
