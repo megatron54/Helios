@@ -1,114 +1,147 @@
 @import "tailwindcss";
 
-/* Scrollbar */
+/* ── Base ── */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #09090b;
+}
+
+/* ── Shared field input ── */
+.field-input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  color: #e4e4e7;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field-input:focus {
+  border-color: #52525b;
+}
+.field-input::placeholder {
+  color: #3f3f46;
+}
+
+/* ── Primary button ── */
+.btn-primary {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #e4e4e7;
+  color: #09090b;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.btn-primary:hover {
+  background: #ffffff;
+}
+.btn-primary:disabled {
+  background: #27272a;
+  color: #52525b;
+  cursor: not-allowed;
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: #27272a;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #3f3f46;
 }
 
-/* Range inputs */
+/* ── Range inputs ── */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
-  height: 20px;
+  height: 16px;
 }
 input[type="range"]::-webkit-slider-track {
-  background: rgba(255, 255, 255, 0.06);
-  height: 3px;
-  border-radius: 2px;
+  background: #27272a;
+  height: 2px;
+  border-radius: 1px;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #d97706;
-  margin-top: -5.5px;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: box-shadow 0.15s;
+  background: #a1a1aa;
+  margin-top: -5px;
+  border: 2px solid #09090b;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.25), 0 1px 4px rgba(0, 0, 0, 0.4);
+  background: #e4e4e7;
 }
 input[type="range"]::-moz-range-track {
-  background: rgba(255, 255, 255, 0.06);
-  height: 3px;
-  border-radius: 2px;
+  background: #27272a;
+  height: 2px;
+  border-radius: 1px;
 }
 input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #d97706;
-  border: none;
-  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: #a1a1aa;
+  border: 2px solid #09090b;
 }
 
-/* Number input arrows */
+/* ── Number input arrows ── */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 0;
 }
 input[type="number"]:hover::-webkit-inner-spin-button,
 input[type="number"]:hover::-webkit-outer-spin-button {
-  opacity: 0.3;
+  opacity: 0.5;
 }
 
-/* Selection */
-::selection {
-  background: rgba(217, 119, 6, 0.25);
-}
-
-/* Focus ring */
-*:focus-visible {
-  outline: 1px solid rgba(217, 119, 6, 0.4);
-  outline-offset: 1px;
-}
-
-/* Step transitions */
-aside > div > div {
-  animation: fadeSlide 0.18s ease-out;
-}
-@keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Select styling */
+/* ── Select ── */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
-  padding-right: 28px !important;
+  padding-right: 24px !important;
 }
 select option {
   background: #18181b;
-  color: rgba(255, 255, 255, 0.8);
+  color: #e4e4e7;
 }
 
-/* No user-select on controls */
+/* ── Selection ── */
+::selection {
+  background: rgba(161, 161, 170, 0.2);
+}
+
+/* ── Focus ── */
+*:focus-visible {
+  outline: 1px solid #52525b;
+  outline-offset: 1px;
+}
+
+/* ── Step transitions ── */
+aside > div > div {
+  animation: fadeIn 0.12s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Non-selectable chrome ── */
 button, label, nav, header {
   user-select: none;
-}
-
-/* Smooth canvas transitions */
-canvas {
-  transition: filter 0.3s;
 }

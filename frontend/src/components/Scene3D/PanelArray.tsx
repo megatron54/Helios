@@ -24,9 +24,9 @@ export default function PanelArray({ panel, roofWidth, roofLength }: PanelArrayP
 
     const positions: [number, number, number][] = [];
     const totalW = cols * PANEL_W + (cols - 1) * GAP_X;
-    const totalL = rows * pitch - (pitch - PANEL_H * Math.cos((panel.tilt * Math.PI) / 180));
+    const totalL = rows * pitch;
     const offsetX = -totalW / 2 + PANEL_W / 2;
-    const offsetZ = -totalL / 2 + (PANEL_H * Math.cos((panel.tilt * Math.PI) / 180)) / 2;
+    const offsetZ = -totalL / 2 + pitch / 2;
 
     for (let r = 0; r < rows; r++) {
       const colsInRow = r === rows - 1 ? count - r * cols : cols;
@@ -39,47 +39,36 @@ export default function PanelArray({ panel, roofWidth, roofLength }: PanelArrayP
       }
     }
 
-    return { positions, overflow: panel.quantity > maxFit };
+    return { positions };
   }, [panel.quantity, panel.tilt, roofWidth, roofLength]);
 
   const tiltRad = (panel.tilt * Math.PI) / 180;
   const azimuthRad = ((panel.azimuth - 180) * Math.PI) / 180;
 
-  // Lift panels so the bottom edge sits on the roof
-  const liftY = 0.12 + Math.sin(tiltRad) * (PANEL_H / 2);
+  // Lift so bottom edge sits on roof
+  const liftY = 0.10 + Math.sin(tiltRad) * (PANEL_H / 2);
 
   return (
     <group position={[0, liftY, 0]} rotation={[0, azimuthRad, 0]}>
       {layout.positions.map((pos, i) => (
         <group key={i} position={pos} rotation={[-tiltRad, 0, 0]}>
-          {/* Panel cell surface */}
-          <mesh castShadow receiveShadow position={[0, 0.015, 0]}>
-            <boxGeometry args={[PANEL_W, 0.018, PANEL_H]} />
+          {/* Single panel mesh — no separate overlapping planes */}
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[PANEL_W, 0.04, PANEL_H]} />
             <meshStandardMaterial
-              color="#152040"
-              metalness={0.75}
-              roughness={0.12}
-              envMapIntensity={1.5}
+              color="#1a2744"
+              metalness={0.6}
+              roughness={0.18}
+              envMapIntensity={1.2}
             />
           </mesh>
-          {/* Aluminum frame */}
-          <mesh castShadow position={[0, 0, 0]}>
-            <boxGeometry args={[PANEL_W + 0.04, 0.035, PANEL_H + 0.04]} />
+          {/* Thin frame border — slightly inset on Y to avoid z-fight */}
+          <mesh position={[0, -0.005, 0]}>
+            <boxGeometry args={[PANEL_W + 0.03, 0.03, PANEL_H + 0.03]} />
             <meshStandardMaterial
-              color="#c0c0c0"
-              metalness={0.85}
-              roughness={0.2}
-            />
-          </mesh>
-          {/* Cell grid lines */}
-          <mesh position={[0, 0.025, 0]}>
-            <planeGeometry args={[PANEL_W - 0.04, PANEL_H - 0.04]} />
-            <meshStandardMaterial
-              color="#0a1428"
-              metalness={0.5}
-              roughness={0.3}
-              transparent
-              opacity={0.4}
+              color="#888888"
+              metalness={0.9}
+              roughness={0.25}
             />
           </mesh>
         </group>

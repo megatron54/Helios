@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { SimulationResult, ConsumptionProfile } from '../../types';
 
 interface MonthlyChartProps {
@@ -23,15 +23,15 @@ export default function MonthlyChart({ result, consumption }: MonthlyChartProps)
   return (
     <div className="h-full w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }} barCategoryGap="20%">
+        <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -20 }} barCategoryGap="25%">
           <XAxis
             dataKey="name"
-            tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }}
-            axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
+            tick={{ fill: '#52525b', fontSize: 10 }}
+            axisLine={{ stroke: '#27272a' }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: 'rgba(255,255,255,0.20)', fontSize: 10 }}
+            tick={{ fill: '#52525b', fontSize: 10 }}
             axisLine={false}
             tickLine={false}
             unit=" kWh"
@@ -39,39 +39,25 @@ export default function MonthlyChart({ result, consumption }: MonthlyChartProps)
           <Tooltip
             contentStyle={{
               backgroundColor: '#18181b',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '10px',
-              fontSize: '12px',
-              color: 'rgba(255,255,255,0.7)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+              border: '1px solid #27272a',
+              borderRadius: '6px',
+              fontSize: '11px',
+              color: '#a1a1aa',
             }}
-            labelStyle={{ color: 'rgba(255,255,255,0.4)' }}
-            cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+            labelStyle={{ color: '#71717a' }}
+            cursor={{ fill: 'rgba(255,255,255,0.02)' }}
           />
           {consumption && (
             <Legend
-              wrapperStyle={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}
-              iconSize={8}
-              iconType="circle"
+              wrapperStyle={{ fontSize: '10px', color: '#71717a' }}
+              iconSize={6}
+              iconType="square"
             />
           )}
-          <Bar
-            dataKey="production"
-            name="Production"
-            fill="#d97706"
-            radius={[3, 3, 0, 0]}
-            fillOpacity={0.85}
-          />
+          <Bar dataKey="production" name="Production" fill="#a1a1aa" radius={[2, 2, 0, 0]} />
           {consumption && (
-            <Bar
-              dataKey="consumption"
-              name="Consumption"
-              fill="#3b82f6"
-              radius={[3, 3, 0, 0]}
-              fillOpacity={0.45}
-            />
+            <Bar dataKey="consumption" name="Consumption" fill="#3f3f46" radius={[2, 2, 0, 0]} />
           )}
-          <ReferenceLine y={0} stroke="rgba(255,255,255,0.06)" />
         </BarChart>
       </ResponsiveContainer>
     </div>

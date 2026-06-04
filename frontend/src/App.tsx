@@ -16,11 +16,11 @@ import type { Location, PanelConfig, SimulationResult, TMYData, Appliance, Elect
 
 type Step = 'location' | 'consumption' | 'system' | 'results';
 
-const STEPS: { key: Step; label: string; num: number }[] = [
-  { key: 'location', label: 'Location', num: 1 },
-  { key: 'consumption', label: 'Consumption', num: 2 },
-  { key: 'system', label: 'System', num: 3 },
-  { key: 'results', label: 'Results', num: 4 },
+const STEPS: { key: Step; label: string }[] = [
+  { key: 'location', label: 'Location' },
+  { key: 'consumption', label: 'Consumption' },
+  { key: 'system', label: 'System' },
+  { key: 'results', label: 'Results' },
 ];
 
 const DEFAULT_PANEL: PanelConfig = {
@@ -130,213 +130,146 @@ export default function App() {
   const currentIdx = STEPS.findIndex((s) => s.key === step);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#09090b] text-neutral-100 overflow-hidden">
-      {/* Top accent line */}
-      <div className="h-[2px] shrink-0 bg-gradient-to-r from-amber-600 via-amber-500 to-orange-500" />
-
+    <div className="h-screen w-screen flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden font-[system-ui]">
       {/* Header */}
-      <header className="h-12 flex items-center px-5 border-b border-white/[0.06] bg-[#09090b] shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-            </svg>
-          </div>
-          <span className="text-[13px] font-semibold tracking-[0.12em] text-white/90">HELIOS</span>
-        </div>
+      <header className="h-11 flex items-center px-4 border-b border-zinc-800/80 shrink-0 gap-6">
+        <span className="text-sm font-bold tracking-wide">Helios</span>
 
-        {/* Step nav */}
-        <nav className="ml-10 flex items-center gap-0">
+        {/* Tabs - simple, not a stepper */}
+        <div className="flex items-center h-full">
           {STEPS.map((s, i) => {
             const accessible = i <= maxVisited;
             const active = s.key === step;
-            const completed = i < currentIdx;
             return (
-              <div key={s.key} className="flex items-center">
-                {i > 0 && (
-                  <div className={`w-8 h-px mx-1 ${i <= maxVisited ? 'bg-white/10' : 'bg-white/[0.04]'}`} />
+              <button
+                key={s.key}
+                onClick={() => accessible && goToStep(s.key)}
+                disabled={!accessible}
+                className={`relative h-full px-3 text-[13px] transition-colors ${
+                  active
+                    ? 'text-zinc-100'
+                    : accessible
+                      ? 'text-zinc-500 hover:text-zinc-300'
+                      : 'text-zinc-700 cursor-not-allowed'
+                }`}
+              >
+                {s.label}
+                {active && (
+                  <span className="absolute bottom-0 inset-x-3 h-[2px] bg-zinc-100 rounded-full" />
                 )}
-                <button
-                  onClick={() => accessible && goToStep(s.key)}
-                  disabled={!accessible}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs transition-all ${
-                    active
-                      ? 'bg-white/[0.08] text-white font-medium'
-                      : completed
-                        ? 'text-white/50 hover:text-white/70 hover:bg-white/[0.04]'
-                        : accessible
-                          ? 'text-white/40 hover:text-white/60 hover:bg-white/[0.04]'
-                          : 'text-white/15 cursor-not-allowed'
-                  }`}
-                >
-                  <span className={`w-5 h-5 rounded-full text-[10px] font-medium flex items-center justify-center border ${
-                    active
-                      ? 'border-amber-500/60 bg-amber-500/15 text-amber-400'
-                      : completed
-                        ? 'border-white/15 bg-white/[0.06] text-white/50'
-                        : accessible
-                          ? 'border-white/10 text-white/30'
-                          : 'border-white/[0.06] text-white/15'
-                  }`}>
-                    {completed ? (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-                    ) : s.num}
-                  </span>
-                  <span>{s.label}</span>
-                </button>
-              </div>
+              </button>
             );
           })}
-        </nav>
+        </div>
 
+        <div className="flex-1" />
         {engineLoading && (
-          <div className="ml-auto flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-[11px] text-white/30">Loading engine</span>
-          </div>
+          <span className="text-[11px] text-zinc-600">Loading engine...</span>
         )}
       </header>
 
       {/* Body */}
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-[400px] border-r border-white/[0.06] flex flex-col shrink-0 bg-[#0c0c0e]">
-          <div className="flex-1 overflow-y-auto p-6">
+        <aside className="w-[360px] border-r border-zinc-800/80 flex flex-col shrink-0">
+          <div className="flex-1 overflow-y-auto px-5 py-5">
 
-            {/* Step: Location */}
             {step === 'location' && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-[15px] font-medium text-white mb-1">Installation location</h2>
-                  <p className="text-[13px] text-white/35 leading-relaxed">
-                    Enter coordinates and roof dimensions. Solar irradiance is modeled from your latitude.
-                  </p>
-                </div>
+              <div className="space-y-5">
+                <p className="text-[13px] text-zinc-400 leading-relaxed">
+                  Set your coordinates and roof dimensions to model solar irradiance.
+                </p>
 
-                <div>
-                  <label className="text-[11px] font-medium text-white/40 uppercase tracking-wider block mb-2.5">Coordinates</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] text-white/30 block mb-1.5">Latitude</label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Latitude">
                       <input
                         type="number"
                         step="0.0001"
                         value={latInput}
                         onChange={(e) => setLatInput(e.target.value)}
-                        className="w-full px-3 py-2 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:border-amber-500/40 focus:bg-white/[0.06] focus:outline-none transition-all font-mono"
+                        className="field-input"
                       />
-                    </div>
-                    <div>
-                      <label className="text-[11px] text-white/30 block mb-1.5">Longitude</label>
+                    </Field>
+                    <Field label="Longitude">
                       <input
                         type="number"
                         step="0.0001"
                         value={lonInput}
                         onChange={(e) => setLonInput(e.target.value)}
-                        className="w-full px-3 py-2 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/20 focus:border-amber-500/40 focus:bg-white/[0.06] focus:outline-none transition-all font-mono"
+                        className="field-input"
                       />
-                    </div>
+                    </Field>
+                  </div>
+
+                  <div className="h-px bg-zinc-800/60" />
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Roof width" suffix="m">
+                      <input
+                        type="number"
+                        min="3" max="30" step="0.5"
+                        value={roofWidth}
+                        onChange={(e) => setRoofWidth(parseFloat(e.target.value) || 10)}
+                        className="field-input"
+                      />
+                    </Field>
+                    <Field label="Roof length" suffix="m">
+                      <input
+                        type="number"
+                        min="3" max="30" step="0.5"
+                        value={roofLength}
+                        onChange={(e) => setRoofLength(parseFloat(e.target.value) || 8)}
+                        className="field-input"
+                      />
+                    </Field>
+                  </div>
+                  <div className="text-[12px] text-zinc-600 tabular-nums">
+                    {(roofWidth * roofLength).toFixed(0)} m2 available
                   </div>
                 </div>
-
-                {/* Roof dimensions */}
-                <div>
-                  <label className="text-[11px] font-medium text-white/40 uppercase tracking-wider block mb-2.5">Roof surface</label>
-                  <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-[11px] text-white/30 block mb-1.5">Width (m)</label>
-                        <input
-                          type="number"
-                          min="3"
-                          max="30"
-                          step="0.5"
-                          value={roofWidth}
-                          onChange={(e) => setRoofWidth(parseFloat(e.target.value) || 10)}
-                          className="w-full px-3 py-2 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white focus:border-amber-500/40 focus:outline-none font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] text-white/30 block mb-1.5">Length (m)</label>
-                        <input
-                          type="number"
-                          min="3"
-                          max="30"
-                          step="0.5"
-                          value={roofLength}
-                          onChange={(e) => setRoofLength(parseFloat(e.target.value) || 8)}
-                          className="w-full px-3 py-2 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white focus:border-amber-500/40 focus:outline-none font-mono"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-white/[0.04] flex items-center justify-between">
-                      <span className="text-[11px] text-white/25">Usable area</span>
-                      <span className="text-[13px] text-white/60 font-mono">{(roofWidth * roofLength).toFixed(0)} m&sup2;</span>
-                    </div>
-                  </div>
-                </div>
-
-                {tmy && (
-                  <div className="flex items-center gap-2.5 text-[12px] text-emerald-400/80 bg-emerald-500/[0.06] px-3.5 py-2.5 rounded-lg border border-emerald-500/10">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    Solar data loaded — 8,760 hourly records
-                  </div>
-                )}
               </div>
             )}
 
-            {/* Step: Consumption */}
             {step === 'consumption' && (
               <div className="flex flex-col h-full">
-                <div className="mb-5">
-                  <h2 className="text-[15px] font-medium text-white mb-1">Energy consumption</h2>
-                  <p className="text-[13px] text-white/35 leading-relaxed">
-                    Select your appliances or enter annual kWh from your electricity bill.
-                  </p>
-                </div>
+                <p className="text-[13px] text-zinc-400 leading-relaxed mb-4">
+                  Estimate your annual energy use from appliances or enter a known figure.
+                </p>
 
-                {/* Mode toggle */}
-                <div className="flex gap-0.5 mb-5 p-1 bg-white/[0.03] rounded-lg border border-white/[0.06]">
+                <div className="flex gap-1 mb-4 p-0.5 bg-zinc-900 rounded-md border border-zinc-800">
                   <button
                     onClick={() => setUseManualInput(false)}
-                    className={`flex-1 py-2 text-[12px] rounded-md transition-all ${
-                      !useManualInput
-                        ? 'bg-white/[0.08] text-white font-medium shadow-sm'
-                        : 'text-white/35 hover:text-white/55'
+                    className={`flex-1 py-1.5 text-[12px] rounded transition-colors ${
+                      !useManualInput ? 'bg-zinc-800 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                   >
                     Appliances
                   </button>
                   <button
                     onClick={() => setUseManualInput(true)}
-                    className={`flex-1 py-2 text-[12px] rounded-md transition-all ${
-                      useManualInput
-                        ? 'bg-white/[0.08] text-white font-medium shadow-sm'
-                        : 'text-white/35 hover:text-white/55'
+                    className={`flex-1 py-1.5 text-[12px] rounded transition-colors ${
+                      useManualInput ? 'bg-zinc-800 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                   >
-                    Manual kWh
+                    Manual entry
                   </button>
                 </div>
 
                 {useManualInput ? (
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-[11px] text-white/30 block mb-1.5">Annual consumption (kWh)</label>
+                  <div>
+                    <Field label="Annual consumption (kWh)">
                       <input
                         type="number"
-                        min="500"
-                        max="100000"
-                        step="100"
+                        min="500" max="100000" step="100"
                         value={manualKwh ?? ''}
                         onChange={(e) => setManualKwh(e.target.value ? parseInt(e.target.value) : null)}
-                        placeholder="e.g. 4500"
-                        className="w-full px-3 py-2.5 text-[13px] bg-white/[0.04] border border-white/[0.08] rounded-lg text-white placeholder:text-white/15 focus:border-amber-500/40 focus:outline-none font-mono"
+                        placeholder="4500"
+                        className="field-input"
                       />
-                    </div>
-                    <p className="text-[12px] text-white/25 leading-relaxed">
-                      EU average household: 3,500 - 5,000 kWh per year. Check your electricity bill for an exact figure.
+                    </Field>
+                    <p className="text-[11px] text-zinc-600 mt-2">
+                      EU average: 3,500 - 5,000 kWh/year
                     </p>
                   </div>
                 ) : (
@@ -347,60 +280,40 @@ export default function App() {
               </div>
             )}
 
-            {/* Step: System */}
             {step === 'system' && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-[15px] font-medium text-white mb-1">System configuration</h2>
-                  <p className="text-[13px] text-white/35 leading-relaxed">
-                    Auto-sized for your consumption profile. Adjust orientation and panel count.
-                  </p>
-                </div>
+              <div className="space-y-4">
+                <p className="text-[13px] text-zinc-400 leading-relaxed">
+                  System auto-sized to cover your consumption. Fine-tune below.
+                </p>
 
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-amber-500/[0.06] border border-amber-500/10">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4" /></svg>
-                  </div>
-                  <div className="text-[12px] text-white/70 leading-relaxed">
-                    <span className="text-amber-400 font-semibold">{recommendation.panelsNeeded} panels</span>
-                    <span className="text-white/30 mx-1.5">/</span>
-                    <span>{recommendation.systemSizeKwp.toFixed(1)} kWp</span>
-                    <span className="text-white/30 mx-1.5">/</span>
-                    <span>{(recommendation.coverageRatio * 100).toFixed(0)}% coverage</span>
-                  </div>
+                <div className="text-[12px] text-zinc-400 bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2">
+                  Suggested: <span className="text-zinc-200 font-medium">{recommendation.panelsNeeded} panels</span>
+                  {' '}<span className="text-zinc-600">({recommendation.systemSizeKwp.toFixed(1)} kWp, {(recommendation.coverageRatio * 100).toFixed(0)}% coverage)</span>
                 </div>
 
                 <PanelControls panel={panel} onChange={setPanel} maxPanels={maxPanels} />
               </div>
             )}
 
-            {/* Step: Results */}
             {step === 'results' && result && (
-              <div className="space-y-5">
-                <div>
-                  <h2 className="text-[15px] font-medium text-white mb-1">Simulation results</h2>
-                  <p className="text-[13px] text-white/35 leading-relaxed">
-                    Hourly simulation across 8,760 TMY data points.
-                  </p>
-                </div>
+              <div className="space-y-4">
                 <ResultsDashboard
                   recommendation={recommendation}
                   consumption={consumption}
                   simulation={result}
                 />
-                <div className="pt-4 border-t border-white/[0.06]">
-                  <PricingInput pricing={pricing} onChange={setPricing} />
-                </div>
+                <div className="h-px bg-zinc-800/60" />
+                <PricingInput pricing={pricing} onChange={setPricing} />
               </div>
             )}
           </div>
 
-          {/* Bottom action bar */}
-          <div className="p-4 border-t border-white/[0.06] flex items-center gap-2.5 shrink-0 bg-[#09090b]">
+          {/* Action bar */}
+          <div className="px-5 py-3 border-t border-zinc-800/80 flex items-center gap-2 shrink-0">
             {currentIdx > 0 && (
               <button
                 onClick={() => goToStep(STEPS[currentIdx - 1].key)}
-                className="px-3.5 py-2 text-[12px] rounded-lg border border-white/[0.08] text-white/40 hover:text-white/70 hover:border-white/[0.15] hover:bg-white/[0.03] transition-all"
+                className="px-3 py-1.5 text-[12px] text-zinc-500 hover:text-zinc-200 transition-colors"
               >
                 Back
               </button>
@@ -408,10 +321,7 @@ export default function App() {
             <div className="flex-1" />
 
             {step === 'location' && (
-              <button
-                onClick={handleLocationContinue}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-lg bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white shadow-sm shadow-amber-500/20 transition-all"
-              >
+              <button onClick={handleLocationContinue} className="btn-primary">
                 Continue
               </button>
             )}
@@ -419,7 +329,7 @@ export default function App() {
               <button
                 onClick={handleConsumptionNext}
                 disabled={consumption.annualKwh === 0}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-lg bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:from-white/[0.06] disabled:to-white/[0.04] disabled:text-white/20 disabled:shadow-none text-white shadow-sm shadow-amber-500/20 transition-all"
+                className="btn-primary"
               >
                 Continue
               </button>
@@ -428,15 +338,15 @@ export default function App() {
               <button
                 onClick={runSimulation}
                 disabled={simulating || (!tmy && !engine)}
-                className="px-5 py-2.5 text-[13px] font-medium rounded-lg bg-gradient-to-b from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:from-white/[0.06] disabled:to-white/[0.04] disabled:text-white/20 disabled:shadow-none text-white shadow-sm shadow-amber-500/20 transition-all"
+                className="btn-primary"
               >
-                {simulating ? 'Running...' : 'Run simulation'}
+                {simulating ? 'Running...' : 'Simulate'}
               </button>
             )}
             {step === 'results' && result && (
               <button
                 onClick={() => generateReport({ location, panel, consumption, recommendation, simulation: result })}
-                className="px-4 py-2.5 text-[13px] font-medium rounded-lg bg-white/[0.06] border border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.1] hover:border-white/[0.12] transition-all"
+                className="px-3.5 py-1.5 text-[12px] text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-md transition-colors"
               >
                 Export PDF
               </button>
@@ -445,7 +355,7 @@ export default function App() {
         </aside>
 
         {/* Viewport */}
-        <main className="flex-1 flex flex-col min-w-0 bg-[#09090b]">
+        <main className="flex-1 flex flex-col min-w-0">
           <div className="flex-1 relative">
             <SolarScene
               panel={panel}
@@ -456,46 +366,67 @@ export default function App() {
               roofLength={roofLength}
             />
 
-            {/* Time overlay */}
-            <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md border border-white/[0.08] rounded-xl px-4 py-3 flex items-center gap-6">
-              <div className="flex items-center gap-2.5">
-                <span className="text-[11px] text-white/30 w-7">Time</span>
-                <input
-                  type="range"
-                  min={5} max={21} step={0.5}
-                  value={hour}
-                  onChange={(e) => setHour(Number(e.target.value))}
-                  className="w-28 accent-amber-500"
-                />
-                <span className="text-[12px] text-white/60 font-mono w-10">
-                  {Math.floor(hour)}:{String(Math.round((hour % 1) * 60)).padStart(2, '0')}
-                </span>
-              </div>
-              <div className="w-px h-4 bg-white/[0.08]" />
-              <div className="flex items-center gap-2.5">
-                <span className="text-[11px] text-white/30 w-7">Date</span>
-                <input
-                  type="range"
-                  min={1} max={365} step={1}
-                  value={dayOfYear}
-                  onChange={(e) => setDayOfYear(Number(e.target.value))}
-                  className="w-28 accent-amber-500"
-                />
-                <span className="text-[12px] text-white/60 font-mono w-12">
-                  {dayToLabel(dayOfYear)}
-                </span>
-              </div>
+            {/* Time controls */}
+            <div className="absolute bottom-3 left-3 flex items-center gap-4 bg-zinc-950/80 backdrop-blur border border-zinc-800/60 rounded-lg px-3 py-2">
+              <TimeSlider
+                label="Time"
+                value={hour}
+                min={5} max={21} step={0.5}
+                display={`${Math.floor(hour)}:${String(Math.round((hour % 1) * 60)).padStart(2, '0')}`}
+                onChange={setHour}
+              />
+              <div className="w-px h-3 bg-zinc-800" />
+              <TimeSlider
+                label="Date"
+                value={dayOfYear}
+                min={1} max={365} step={1}
+                display={dayToLabel(dayOfYear)}
+                onChange={setDayOfYear}
+              />
             </div>
           </div>
 
-          {/* Bottom chart */}
           {result && (
-            <div className="h-48 border-t border-white/[0.06] bg-[#0c0c0e] px-6 py-3">
+            <div className="h-44 border-t border-zinc-800/80 bg-zinc-950 px-5 py-3">
               <MonthlyChart result={result} consumption={consumption} />
             </div>
           )}
         </main>
       </div>
+    </div>
+  );
+}
+
+/* ── Shared sub-components ── */
+
+function Field({ label, suffix, children }: { label: string; suffix?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="text-[11px] text-zinc-500 block mb-1">{label}</label>
+      <div className="relative">
+        {children}
+        {suffix && (
+          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-zinc-600">{suffix}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TimeSlider({ label, value, min, max, step, display, onChange }: {
+  label: string; value: number; min: number; max: number; step: number; display: string; onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] text-zinc-600 w-7">{label}</span>
+      <input
+        type="range"
+        min={min} max={max} step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-24"
+      />
+      <span className="text-[11px] text-zinc-400 font-mono w-10">{display}</span>
     </div>
   );
 }
