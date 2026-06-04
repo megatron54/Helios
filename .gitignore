@@ -1,0 +1,23 @@
+# Build
+engine/build/
+*.obj
+*.exe
+*.a
+*.o
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# WASM build artifacts
+engine/wasm-build/
