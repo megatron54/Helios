@@ -21,3 +21,7 @@ dist/
 
 # WASM build artifacts
 engine/wasm/build/
+
+# WASM binaries in frontend (built by CI)
+frontend/public/helios.js
+frontend/public/helios.wasm
