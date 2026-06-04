@@ -5,6 +5,7 @@ import { calculateConsumptionProfile } from './lib/consumption';
 import { calculateRecommendation, estimateSpecificYield, buildPanelConfig, DEFAULT_PRICING } from './lib/recommendation';
 import { generateReport } from './lib/report';
 import { generateSyntheticTMY } from './lib/synthetic-tmy';
+import { maxPanelsForRoof } from './lib/roof-layout';
 import ConsumptionEstimator from './components/Consumption/ConsumptionEstimator';
 import PanelControls from './components/Controls/PanelControls';
 import PricingInput from './components/Controls/PricingInput';
@@ -74,6 +75,8 @@ export default function App() {
     return estimateSpecificYield(location.latitude);
   }, [result, location.latitude]);
 
+  const maxPanels = useMemo(() => maxPanelsForRoof(roofWidth, roofLength), [roofWidth, roofLength]);
+
   const recommendation = useMemo(() => {
     return calculateRecommendation({ consumption, specificYield, panelWp: panel.ratedPower, pricing });
   }, [consumption, specificYield, panel.ratedPower, pricing]);
@@ -100,6 +103,7 @@ export default function App() {
 
   const handleConsumptionNext = () => {
     const suggested = buildPanelConfig(recommendation, panel, location.latitude);
+    suggested.quantity = Math.min(suggested.quantity, maxPanels);
     setPanel(suggested);
     goToStep('system');
   };
@@ -325,7 +329,7 @@ export default function App() {
                   {(recommendation.coverageRatio * 100).toFixed(0)}% coverage
                 </div>
 
-                <PanelControls panel={panel} onChange={setPanel} />
+                <PanelControls panel={panel} onChange={setPanel} maxPanels={maxPanels} />
               </div>
             )}
 

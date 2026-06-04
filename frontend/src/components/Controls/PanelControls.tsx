@@ -4,6 +4,7 @@ import type { PanelConfig } from '../../types';
 interface PanelControlsProps {
   panel: PanelConfig;
   onChange: (cfg: PanelConfig) => void;
+  maxPanels: number;
 }
 
 const PANEL_PRESETS: Record<string, Partial<PanelConfig>> = {
@@ -51,7 +52,7 @@ function Slider({
   );
 }
 
-export default function PanelControls({ panel, onChange }: PanelControlsProps) {
+export default function PanelControls({ panel, onChange, maxPanels }: PanelControlsProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const update = (key: keyof PanelConfig, value: number) => {
@@ -95,8 +96,9 @@ export default function PanelControls({ panel, onChange }: PanelControlsProps) {
       <Slider
         label="Panels"
         value={panel.quantity}
-        min={1} max={60} step={1} unit=""
+        min={1} max={maxPanels} step={1} unit={` / ${maxPanels}`}
         onChange={(v) => update('quantity', v)}
+        tooltip={`Max ${maxPanels} panels fit on your roof`}
       />
 
       {/* Advanced toggle */}
