@@ -1,10 +1,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useHeliosEngine } from './hooks/useHeliosEngine';
-import { usePVGIS } from './hooks/usePVGIS';
 import { getDefaultAppliances } from './data/appliances';
 import { calculateConsumptionProfile } from './lib/consumption';
 import { calculateRecommendation, estimateSpecificYield, buildPanelConfig, DEFAULT_PRICING } from './lib/recommendation';
 import { generateReport } from './lib/report';
+import { generateSyntheticTMY } from './lib/synthetic-tmy';
 import ConsumptionEstimator from './components/Consumption/ConsumptionEstimator';
 import PanelControls from './components/Controls/PanelControls';
 import PricingInput from './components/Controls/PricingInput';
@@ -35,7 +35,6 @@ const DEFAULT_PANEL: PanelConfig = {
 
 export default function App() {
   const { engine, loading: engineLoading } = useHeliosEngine();
-  const { fetchTMY, loading: tmyLoading, error: tmyError } = usePVGIS();
 
   const [step, setStep] = useState<Step>('location');
   const [maxVisited, setMaxVisited] = useState(0);
@@ -86,19 +85,17 @@ export default function App() {
     setMaxVisited((prev) => Math.max(prev, idx));
   };
 
-  // Auto-fetch TMY when location changes (debounced)
-  const handleFetchSolarData = async () => {
-    const loc: Location = {
-      latitude: parseFloat(latInput) || 40.4168,
-      longitude: parseFloat(lonInput) || -3.7038,
-      elevation: 0,
-    };
+  // Generate TMY data and proceed immediately
+  const handleLocationContinue = () => {
+    const lat = parseFloat(latInput) || 40.4168;
+    const lon = parseFloat(lonInput) || -3.7038;
+    const loc: Location = { latitude: lat, longitude: lon, elevation: 0 };
     setLocation(loc);
-    const data = await fetchTMY(loc);
-    if (data) {
-      setTmy(data);
-      goToStep('consumption');
-    }
+
+    // Generate synthetic clear-sky TMY (instant, no network)
+    const syntheticData = generateSyntheticTMY(lat, lon, 0);
+    setTmy(syntheticData);
+    goToStep('consumption');
   };
 
   const handleConsumptionNext = () => {
@@ -129,17 +126,6 @@ export default function App() {
       }
     }, 16);
   }, [engine, tmy, location, panel]);
-
-  // Allow skipping to system step without TMY (use estimates)
-  const handleSkipToSystem = () => {
-    const loc: Location = {
-      latitude: parseFloat(latInput) || 40.4168,
-      longitude: parseFloat(lonInput) || -3.7038,
-      elevation: 0,
-    };
-    setLocation(loc);
-    goToStep('consumption');
-  };
 
   const currentIdx = STEPS.findIndex((s) => s.key === step);
 
@@ -192,7 +178,7 @@ export default function App() {
                 <div>
                   <h2 className="text-base font-medium text-neutral-100 mb-1.5">Your location</h2>
                   <p className="text-xs text-neutral-500 leading-relaxed">
-                    Enter your coordinates. Solar irradiance data will be fetched from the EU PVGIS database.
+                    Enter your coordinates and roof dimensions. Solar irradiance is modeled based on your latitude.
                   </p>
                 </div>
 
@@ -257,18 +243,6 @@ export default function App() {
                   <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/8 px-3 py-2 rounded-md border border-emerald-500/20">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                     Solar data loaded (8,760 hourly records)
-                  </div>
-                )}
-
-                {tmyError && (
-                  <div className="text-xs text-red-400 bg-red-500/8 px-3 py-2 rounded-md border border-red-500/20">
-                    {tmyError}
-                    <button
-                      onClick={handleSkipToSystem}
-                      className="block mt-1.5 text-neutral-300 underline"
-                    >
-                      Continue with estimated data instead
-                    </button>
                   </div>
                 )}
               </div>
@@ -390,11 +364,10 @@ export default function App() {
 
             {step === 'location' && (
               <button
-                onClick={handleFetchSolarData}
-                disabled={tmyLoading}
-                className="px-5 py-2.5 text-sm font-medium rounded-md bg-amber-600 hover:bg-amber-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white transition-colors"
+                onClick={handleLocationContinue}
+                className="px-5 py-2.5 text-sm font-medium rounded-md bg-amber-600 hover:bg-amber-500 text-white transition-colors"
               >
-                {tmyLoading ? 'Loading...' : 'Continue'}
+                Continue
               </button>
             )}
             {step === 'consumption' && (
