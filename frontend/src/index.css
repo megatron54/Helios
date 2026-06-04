@@ -1,89 +1,83 @@
 @import "tailwindcss";
 
-/* Custom scrollbar styling for dark theme */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #404040;
+  background: #333;
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #525252;
+  background: #555;
 }
 
-/* Range input styling */
+/* Range inputs */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
+  height: 20px;
 }
-
 input[type="range"]::-webkit-slider-track {
-  background: #262626;
-  height: 4px;
+  background: #252530;
+  height: 3px;
   border-radius: 2px;
 }
-
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #d97706;
-  margin-top: -5px;
-  border: 2px solid #0a0a0a;
+  margin-top: -4.5px;
+  box-shadow: 0 0 4px rgba(217, 119, 6, 0.4);
 }
-
 input[type="range"]::-moz-range-track {
-  background: #262626;
-  height: 4px;
+  background: #252530;
+  height: 3px;
   border-radius: 2px;
 }
-
 input[type="range"]::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   background: #d97706;
-  border: 2px solid #0a0a0a;
+  border: none;
+  box-shadow: 0 0 4px rgba(217, 119, 6, 0.4);
 }
 
-/* Checkbox styling */
-input[type="checkbox"] {
-  cursor: pointer;
+/* Number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
 }
 
-/* Select styling */
-select {
-  cursor: pointer;
+/* Selection */
+::selection {
+  background: rgba(217, 119, 6, 0.3);
 }
 
-/* Leaflet dark theme override */
-.leaflet-container {
-  background: #171717 !important;
+/* Focus ring */
+*:focus-visible {
+  outline: 1px solid rgba(217, 119, 6, 0.5);
+  outline-offset: 1px;
 }
 
-/* Prevent text selection on interactive elements */
-button, label, nav {
+/* Transitions on step content */
+aside > div > div {
+  animation: slideIn 0.12s ease-out;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* No user-select on controls */
+button, label, nav, header {
   user-select: none;
-}
-
-/* Smooth transitions on step changes */
-aside > div {
-  animation: fadeIn 0.15s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
 }
