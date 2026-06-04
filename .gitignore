@@ -20,4 +20,4 @@ dist/
 .cache/
 
 # WASM build artifacts
-engine/wasm-build/
+engine/wasm/build/
