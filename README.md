@@ -4,6 +4,15 @@ Solar energy system planner with real-time 3D visualization, hourly energy dispa
 
 **[Live Demo](https://megatron54.github.io/Helios/)**
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-r184-000000?logo=three.js&logoColor=white)
+![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus&logoColor=white)
+![WebAssembly](https://img.shields.io/badge/WebAssembly-Emscripten-654FF0?logo=webassembly&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 ## What it does
 
 Helios designs and simulates a complete photovoltaic system tailored to your location, consumption, and preferences. It runs entirely in the browser with no backend or API dependencies.
@@ -149,3 +158,8 @@ helios/
 ## License
 
 MIT
+
+## Autor
+
+**Miguel Serra Ferrando** — Telecommunications Engineer
+[GitHub](https://github.com/megatron54) · [LinkedIn](https://www.linkedin.com/in/miguel-serra-ferrando) · [Email](mailto:miguel.serra.ferrando@gmail.com)
